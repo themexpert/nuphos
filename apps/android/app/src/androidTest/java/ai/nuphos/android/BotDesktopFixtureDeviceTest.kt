@@ -463,7 +463,11 @@ class BotDesktopFixtureDeviceTest {
                 top?.let { bottom <= it } ?: false
             }
         }.isSuccess
-        assertTrue("Cancel and Save end at $bottom, under the keyboard at ${top ?: "closed"}", above)
+        val sheet = compose.onNodeWithTag("task-summary").fetchSemanticsNode()
+        val range = sheet.config.getOrNull(androidx.compose.ui.semantics.SemanticsProperties.VerticalScrollAxisRange)
+        val diag = "DIAG sheetTop=${sheet.positionOnScreen.y} sheetBottom=${sheet.positionOnScreen.y + sheet.size.height}" +
+            " scroll=${range?.value?.invoke()}/${range?.maxValue?.invoke()}"
+        assertTrue("Cancel and Save end at $bottom, under the keyboard at ${top ?: "closed"}; $diag", above)
         compose.onNodeWithTag("bot-instructions-save").assertIsDisplayed()
     }
 
