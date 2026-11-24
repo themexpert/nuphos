@@ -194,6 +194,19 @@ impl Api {
         self.call(Method::POST, "/agent/bots", &[("teamId", team)], Some(body)).await
     }
 
+    /// Replaces a Bot's standing instructions, as its owner does in Bot details:
+    /// `{ instructions }`.
+    pub async fn set_bot_instructions(&self, team: &str, session: &str, instructions: &str) -> Result<Value, ApiError> {
+        let body = json!({ "instructions": instructions });
+        self.call(
+            Method::PATCH,
+            &format!("/agent/conversations/{session}/instructions"),
+            &[("teamId", team)],
+            Some(&body),
+        )
+        .await
+    }
+
     /// The sidebar favorites, pinned conversations among them: `{ entries, revision }`.
     pub async fn favorites(&self, team: &str) -> Result<Value, ApiError> {
         self.call(Method::GET, &format!("/teams/{team}/favorites"), &[], None).await

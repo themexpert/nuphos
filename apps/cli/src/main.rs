@@ -99,13 +99,18 @@ enum Command {
         #[arg(long, requires = "name", conflicts_with = "session")]
         login: bool,
     },
-    /// List your Bots in the team, or create one named NAME with --create. A new Bot runs with Full Access.
+    /// List your Bots in the team, create one named NAME with --create, or set Bot NAME's
+    /// standing instructions with --instructions. A new Bot runs with Full Access.
     #[command(name = "bots", alias = "bot")]
     Bots {
         name: Option<String>,
         /// Create a Bot named NAME.
         #[arg(long, requires = "name")]
         create: bool,
+        /// Replace the Bot's standing instructions with the text of FILE (`-` reads stdin).
+        /// An empty file clears them.
+        #[arg(long, value_name = "FILE", requires = "name")]
+        instructions: Option<String>,
         /// The new Bot's face, such as 01-vermeer-girl (the desktop's Bot picker shows them).
         #[arg(long, requires = "create")]
         avatar: Option<String>,
@@ -367,8 +372,8 @@ async fn run(args: Args) -> Result<i32> {
         Some(Command::Runtime { name, session, make_default, .. }) => {
             cli::runtime(&mut ctx, name, session, make_default).await.map(|_| 0)
         }
-        Some(Command::Bots { name, create, avatar, runtime }) => {
-            bots::bots(&ctx, name, create, avatar, runtime).await.map(|_| 0)
+        Some(Command::Bots { name, create, instructions, avatar, runtime }) => {
+            bots::bots(&ctx, name, create, instructions, avatar, runtime).await.map(|_| 0)
         }
         Some(Command::Model { value, effort, session }) => {
             cli::model(&mut ctx, value, effort, session).await.map(|_| 0)
